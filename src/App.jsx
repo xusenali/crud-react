@@ -51,17 +51,58 @@ function App() {
   }
 
   function addheart(event) {
-    event.target.classList.toggle('text-red-500');
-   
-    const id = Number(event.target.getAttribute('data-heart-id'));
-
+    const isHearted = event.target.classList.toggle('text-red-500');
     
+    const id = Number(event.target.getAttribute('data-heart-id'));
+  
+    if (isHearted) {
+      users.forEach(element => {
+        if (id === element.id) {
+          const isLiked = likedUsers.some(user => user.id === element.id);
+          if (!isLiked) {
+            likedUsers.push(element);
+            console.log(likedUsers);
+            setLikedUsers(likedUsers);
+            localStorage.setItem('likedUsers', JSON.stringify(likedUsers));
+            
+            
+          }
+        }
+      });
+    } else {
+      removeLikedUsers(id); 
+    }
+  
+    function removeLikedUsers(id) {
+      likedUsers = likedUsers.filter(user => user.id !== id);
+      console.log(likedUsers);
+      setLikedUsers(likedUsers);
+      localStorage.setItem('likedUsers', JSON.stringify(likedUsers));
+    }
+    loadHearts()
   }
+  function loadHearts() {
+    const heartElements = document.querySelectorAll('[data-heart-id]');
+    heartElements.forEach(heart => {
+      const id = Number(heart.getAttribute('data-heart-id'));
+      const isLiked = likedUsers.some(user => user.id === id);
+      if (isLiked) {
+        heart.classList.add('text-red-500');
+      } 
+    });
+  }
+ 
   return (
     <>
       <div className='bg-white-400 h-20 w-100% flex justify-between items-center p-5'>
         <h1 className=' text-3xl' >users</h1>
-        <button onClick={formleft} id='AddBtn' className='p-2.5 rounded bg-blue-600 text-white'>Add</button>
+        <div className="icongg flex gap-4">
+          <select name="heartcategory" id="" className='p-3 border-1 rounded'>
+            <option value="All">All</option>
+            <option value="Favorite">Favorite</option>
+          </select>
+          <button onClick={formleft} id='AddBtn' className='p-2.5 rounded bg-blue-600 text-white'>Add</button>
+        </div>
       </div>
       <div className="users relative w-100% h-200 shadow-2xl shadow-gray-900 overflow-hidden p-5">
         <ul className=' p-5 flex justify-between'>
